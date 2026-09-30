@@ -21,3 +21,113 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model Employee {
+  id           Int      @id @default(autoincrement())
+  userId       Int?     @unique
+  firstName    String
+  lastName     String
+  email        String   @unique
+  phone        String?
+  department   String?
+  designation  String?
+  joiningDate  DateTime?
+  salary       Float?
+  status       String   @default("ACTIVE")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Customer {
+  id          Int      @id @default(autoincrement())
+  name        String
+  companyName String?
+  email       String?
+  phone       String
+  gstin       String?
+  address     String?
+  city        String?
+  creditLimit Float?
+  status      String   @default("ACTIVE")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  orders Order[]
+}
+
+
+model Product {
+  id                   Int                    @id @default(autoincrement())
+  name                 String
+  sku                  String                 @unique
+  category             String
+  brand                String?
+  unit                 String
+  purchasePrice        Float?
+  sellingPrice         Float
+  currentStock         Float                  @default(0)
+  minimumStock         Float                  @default(0)
+  status               String                 @default("ACTIVE")
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+
+  inventoryTransactions InventoryTransaction[]
+  orderItems            OrderItem[]
+}
+
+model InventoryTransaction {
+  id        Int      @id @default(autoincrement())
+  productId Int
+  type      String
+  quantity  Float
+  note      String?
+  createdAt DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@index([createdAt])
+}
+
+model Order {
+  id          Int         @id @default(autoincrement())
+  orderNumber String      @unique
+  customerId  Int
+  status      String      @default("PENDING")
+
+  subtotal    Float
+  discount    Float       @default(0)
+  total       Float
+
+  notes       String?
+
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  customer    Customer    @relation(fields: [customerId],references: [id])
+
+  items       OrderItem[]
+
+  @@index([customerId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model OrderItem {
+  id          Int      @id @default(autoincrement())
+  orderId     Int
+  productId   Int
+
+  quantity    Float
+  unitPrice   Float
+  total       Float
+
+  createdAt   DateTime @default(now())
+
+  order       Order    @relation(fields: [orderId],references: [id],onDelete: Cascade)
+
+  product     Product  @relation( fields: [productId], references: [id]  )
+
+  @@index([orderId])
+  @@index([productId])
+}

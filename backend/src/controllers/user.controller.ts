@@ -30,41 +30,41 @@ export async function getUsers(
   }
 }
 
-export async function createUser(
-  req: Request,
-  res: Response
-) {
-  try {
-    const { email, password, role } = req.body;
+// export async function createUser(
+//   req: Request,
+//   res: Response
+// ) {
+//   try {
+//     const { email, password, role } = req.body;
 
-    const user = await prisma.user.create({
-      data: {
-        email,
-        password,
-        role: role || "EMPLOYEE",
-      },
-      select: {
-        id: true,
-        email: true,
-        role: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-    });
+//     const user = await prisma.user.create({
+//       data: {
+//         email,
+//         password,
+//         role: role || "EMPLOYEE",
+//       },
+//       select: {
+//         id: true,
+//         email: true,
+//         role: true,
+//         createdAt: true,
+//         updatedAt: true,
+//       },
+//     });
 
-    res.status(201).json({
-      success: true,
-      data: user,
-    });
-  } catch (error) {
-    console.error("CREATE USER ERROR:", error);
+//     res.status(201).json({
+//       success: true,
+//       data: user,
+//     });
+//   } catch (error) {
+//     console.error("CREATE USER ERROR:", error);
 
-    res.status(500).json({
-      success: false,
-      message: "Failed to create user",
-    });
-  }
-}
+//     res.status(500).json({
+//       success: false,
+//       message: "Failed to create user",
+//     });
+//   }
+// }
 
 export async function getUserById(
   req: Request,

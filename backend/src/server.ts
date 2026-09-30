@@ -7,6 +7,11 @@ import { prisma } from "./lib/prisma.js";
 import cookieParser from "cookie-parser";
 import userRoutes from "./routes/user.routes.js";
 import authRoutes from "./routes/auth.routes.js";
+import employeeRoutes from "./routes/employee.routes.js";
+import customerRoutes from "./routes/customer.routes.js";
+import productRoutes from "./routes/product.routes.js";
+import inventoryRoutes from "./routes/inventory.routes.js";
+import orderRoutes from "./routes/order.routes.js";
 
 dotenv.config();
 
@@ -46,7 +51,11 @@ app.get("/api/health", async (_req, res) => {
 
 app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
-
+app.use("/api/employees", employeeRoutes);
+app.use("/api/customers", customerRoutes);
+app.use("/api/products", productRoutes);
+app.use("/api/inventory", inventoryRoutes);
+app.use("/api/orders", orderRoutes);
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
