@@ -6,14 +6,26 @@ import {
   deleteUser,
 } from "../controllers/user.controller.js";
 import { authenticate } from "../middleware/auth.middleware.js";
+import { authorize } from "../middleware/role.middleware.js";
+
 
 const router = Router();
 
 
 router.get("/", authenticate, getUsers);
 router.get("/:id", authenticate, getUserById);
-router.patch("/:id", authenticate, updateUser);
-router.delete("/:id", authenticate, deleteUser);
+router.patch(
+  "/:id",
+  authenticate,
+  authorize("ADMIN"),
+  updateUser
+);
+router.patch(
+  "/:id",
+  authenticate,
+  authorize("ADMIN"),
+  deleteUser
+);
 
 
 

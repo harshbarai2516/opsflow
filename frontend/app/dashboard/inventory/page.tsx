@@ -67,10 +67,10 @@ export default function InventoryPage() {
         transactionsResponse.data || []
       );
     } catch (error) {
-      console.error(
-        "Failed to load inventory:",
-        error
-      );
+      // console.error(
+      //   "Failed to load inventory:",
+      //   error
+      // );
 
       showToast({
         type: "warning",
@@ -195,10 +195,10 @@ export default function InventoryPage() {
 
       await loadData();
     } catch (error) {
-      console.error(
-        "Failed to create transaction:",
-        error
-      );
+      // console.error(
+      //   "Failed to create transaction:",
+      //   error
+      // );
 
       showToast({
         type: "error",

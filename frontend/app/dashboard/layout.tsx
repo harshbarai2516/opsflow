@@ -4,6 +4,8 @@ import type { ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { logoutUser } from "@/lib/api";
 import ToastTest from "@/components/ui/ToastTest";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 
 
@@ -15,6 +17,54 @@ export default function DashboardLayout({
   children,
 }: DashboardLayoutProps) {
   const router = useRouter();
+
+  const pathname = usePathname();
+
+  const navigation = [
+    {
+      label: "Dashboard",
+      href: "/dashboard",
+    },
+    {
+      label: "Employees",
+      href: "/dashboard/employees",
+    },
+    {
+      label: "Customers",
+      href: "/dashboard/customers",
+    },
+    {
+      label: "Products",
+      href: "/dashboard/products",
+    },
+    {
+      label: "Inventory",
+      href: "/dashboard/inventory",
+    },
+    {
+      label: "Orders",
+      href: "/dashboard/orders",
+    },
+    {
+      label: "Invoices",
+      href: "/dashboard/invoices",
+    },
+    {
+      label: "Payments",
+      href: "/dashboard/payment",
+    },
+    {
+      label: "Analytics",
+      href: "/dashboard/analytics",
+    },
+  ];
+
+  const systemNavigation = [
+    {
+      label: "Settings",
+      href: "/dashboard/settings",
+    },
+  ];
 
   async function handleLogout() {
     try {
@@ -28,86 +78,101 @@ export default function DashboardLayout({
   return (
     <div className="min-h-screen bg-slate-950 text-white">
       <div className="flex min-h-screen">
-        <aside className="hidden w-64 border-r border-slate-800 bg-slate-900 md:block">
-          <div className="border-b border-slate-800 px-6 py-5">
-            <h1 className="text-xl font-bold tracking-wide">
-              OPSFLOW
-            </h1>
+        <aside className="hidden w-64 shrink-0 border-r border-slate-800 bg-slate-900 md:flex md:flex-col">
+          {/* BRAND */}
+          <div className="shrink-0 border-b border-slate-800 px-6 py-5">
+            <Link
+              href="/dashboard"
+              className="block"
+            >
+              <h1 className="text-xl font-bold tracking-wide text-white">
+                OPSFLOW
+              </h1>
 
-            <p className="mt-1 text-xs text-slate-500">
-              Operations platform
-            </p>
+              <p className="mt-1 text-xs text-slate-500">
+                Operations platform
+              </p>
+            </Link>
           </div>
 
-          <nav className="p-4">
-            <p className="mb-3 px-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
-              Workspace
-            </p>
+          {/* NAVIGATION */}
+          <div className="flex-1 overflow-y-auto p-4">
+            {/* WORKSPACE */}
+            <div>
+              <p className="mb-3 px-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                Workspace
+              </p>
 
-            <div className="space-y-1">
-              <a
-                href="/dashboard"
-                className="block rounded-lg bg-slate-800 px-3 py-2.5 text-sm font-medium text-white"
-              >
-                Dashboard
-              </a>
+              <nav className="space-y-1">
+                {navigation.map((item) => {
+                  const isActive =
+                    item.href === "/dashboard"
+                      ? pathname === "/dashboard"
+                      : pathname === item.href ||
+                      pathname.startsWith(
+                        `${item.href}/`
+                      );
 
-              <a
-                href="/dashboard/employees"
-                className="block rounded-lg px-3 py-2.5 text-sm text-slate-400 hover:bg-slate-800 hover:text-white"
-              >
-                Employees
-              </a>
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={`group flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition ${isActive
+                        ? "bg-blue-600/15 text-blue-400 ring-1 ring-inset ring-blue-500/20"
+                        : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                        }`}
+                    >
+                      <span
+                        className={`mr-3 h-1.5 w-1.5 rounded-full transition ${isActive
+                          ? "bg-blue-400"
+                          : "bg-slate-700 group-hover:bg-slate-500"
+                          }`}
+                      />
 
-              <a
-                href="/dashboard/customers"
-                className="block rounded-lg px-3 py-2.5 text-sm text-slate-400 hover:bg-slate-800 hover:text-white"
-              >
-                Customers
-              </a>
-
-              <a
-                href="/dashboard/products"
-                className="block rounded-lg px-3 py-2.5 text-sm text-slate-400 hover:bg-slate-800 hover:text-white"
-              >
-                Products
-              </a>
-
-              <a
-                href="/dashboard/inventory"
-                className="block rounded-lg px-3 py-2.5 text-sm text-slate-400 hover:bg-slate-800 hover:text-white"
-              >
-                Inventory
-              </a>
-
-              <a
-                href="/dashboard/orders"
-                className="block rounded-lg px-3 py-2.5 text-sm text-slate-400 hover:bg-slate-800 hover:text-white"
-              >
-                Orders
-              </a>
-
-              <a
-                href="/dashboard/analytics"
-                className="block rounded-lg px-3 py-2.5 text-sm text-slate-400 hover:bg-slate-800 hover:text-white"
-              >
-                Analytics
-              </a>
+                      {item.label}
+                    </Link>
+                  );
+                })}
+              </nav>
             </div>
 
+            {/* SYSTEM */}
             <div className="mt-8">
               <p className="mb-3 px-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
                 System
               </p>
 
-              <a
-                href="/dashboard/settings"
-                className="block rounded-lg px-3 py-2.5 text-sm text-slate-400 hover:bg-slate-800 hover:text-white"
-              >
-                Settings
-              </a>
+              <nav className="space-y-1">
+                {systemNavigation.map((item) => {
+                  const isActive =
+                    pathname === item.href ||
+                    pathname.startsWith(
+                      `${item.href}/`
+                    );
+
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={`group flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition ${isActive
+                        ? "bg-blue-600/15 text-blue-400 ring-1 ring-inset ring-blue-500/20"
+                        : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                        }`}
+                    >
+                      <span
+                        className={`mr-3 h-1.5 w-1.5 rounded-full transition ${isActive
+                          ? "bg-blue-400"
+                          : "bg-slate-700 group-hover:bg-slate-500"
+                          }`}
+                      />
+
+                      {item.label}
+                    </Link>
+                  );
+                })}
+              </nav>
             </div>
-          </nav>
+          </div>
         </aside>
 
         <div className="flex min-w-0 flex-1 flex-col">

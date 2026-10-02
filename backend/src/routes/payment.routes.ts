@@ -1,13 +1,15 @@
 import { Router } from "express";
+
 import {
-  getEmployees,
-  createEmployee,
-  getEmployeeById,
-  updateEmployee,
-  deleteEmployee
-} from "../controllers/employee.controller.js";
+  createPayment,
+  getPaymentById,
+  getPayments,
+} from "../controllers/payment.controller.js";
+
 import { authenticate } from "../middleware/auth.middleware.js";
 import { authorize } from "../middleware/role.middleware.js";
+
+
 
 const router = Router();
 
@@ -15,28 +17,21 @@ router.get(
   "/",
   authenticate,
   authorize("ADMIN", "MANAGER"),
-  getEmployees
+  getPayments
+);
+
+router.get(
+  "/:id",
+  authenticate,
+  authorize("ADMIN", "MANAGER"),
+  getPaymentById
 );
 
 router.post(
   "/",
   authenticate,
   authorize("ADMIN", "MANAGER"),
-  createEmployee
-);
-
-router.put(
-  "/:id",
-  authenticate,
-  authorize("ADMIN", "MANAGER"),
-  updateEmployee
-);
-
-router.delete(
-  "/:id",
-  authenticate,
-  authorize("ADMIN"),
-  deleteEmployee
+  createPayment
 );
 
 export default router;

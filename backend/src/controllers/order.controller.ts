@@ -1,4 +1,4 @@
-import type  { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { prisma } from "../lib/prisma.js";
 
 const VALID_STATUSES = [
@@ -21,6 +21,20 @@ function generateOrderNumber() {
   );
 
   return `ORD-${year}${month}${day}-${randomPart}`;
+}
+
+function generateInvoiceNumber() {
+  const now = new Date();
+
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+
+  const randomPart = Math.floor(
+    1000 + Math.random() * 9000
+  );
+
+  return `INV-${year}${month}${day}-${randomPart}`;
 }
 
 // ==========================================
@@ -293,6 +307,7 @@ export async function getOrders(
                 name: true,
                 sku: true,
                 unit: true,
+                currentStock: true,
               },
             },
           },
@@ -352,6 +367,7 @@ export async function getOrderById(
                 sku: true,
                 unit: true,
                 sellingPrice: true,
+                currentStock: true,
               },
             },
           },
@@ -556,6 +572,25 @@ export async function updateOrderStatus(
 
           // ==============================
           // STEP 3
+          // Create invoice
+          // ==============================
+
+          await tx.invoice.create({
+            data: {
+              invoiceNumber: generateInvoiceNumber(),
+              customerId: order.customerId,
+              orderId: order.id,
+              subtotal: order.subtotal,
+              discount: order.discount,
+              tax: 0,
+              total: order.total,
+              status: "UNPAID",
+            },
+          });
+
+
+          // ==============================
+          // STEP 4
           // Confirm order
           // ==============================
 

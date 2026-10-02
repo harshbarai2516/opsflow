@@ -263,6 +263,8 @@ export async function deleteProduct(
   return apiRequest(`/api/products/${id}`, {
     method: "DELETE",
   });
+
+  
 }
 
 // =============================
@@ -401,4 +403,35 @@ export async function updateOrderStatus(
     method: "PATCH",
     body: JSON.stringify({ status }),
   });
+}
+
+
+export async function getInvoices() {
+  return apiRequest("/api/invoices");
+}
+
+export async function getInvoiceById(id: number) {
+  return apiRequest(`/api/invoices/${id}`);
+}
+
+export async function getPayments() {
+  return apiRequest("/api/payments");
+}
+
+export async function createPayment(data: {
+  invoiceId: number;
+  customerId: number;
+  amount: number;
+  paymentMethod: string;
+  reference?: string;
+  notes?: string;
+}) {
+  return apiRequest("/api/payments", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function getAnalyticsSummary() {
+    return apiRequest("/api/analytics/summary");
 }

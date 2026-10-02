@@ -80,7 +80,7 @@ export function ToastProvider({
     >
       {children}
 
-      <div className="pointer-events-none fixed right-4 top-4 z-[100] flex w-[calc(100vw-2rem)] max-w-sm flex-col gap-3">
+        <div className="fixed left-1/2 top-1/2 z-50 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 space-y-3">
         {toasts.map((toast) => (
           <Toast
             key={toast.id}

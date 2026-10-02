@@ -52,7 +52,9 @@ model Customer {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  orders Order[]
+  orders      Order[]
+  invoices    Invoice[]
+  payments    Payment[]
 }
 
 
@@ -107,6 +109,8 @@ model Order {
   customer    Customer    @relation(fields: [customerId],references: [id])
 
   items       OrderItem[]
+  invoice     Invoice?
+
 
   @@index([customerId])
   @@index([status])
@@ -130,4 +134,54 @@ model OrderItem {
 
   @@index([orderId])
   @@index([productId])
+}
+
+model Invoice {
+  id            Int      @id @default(autoincrement())
+  invoiceNumber String   @unique
+  customerId    Int
+  orderId       Int      @unique
+
+  subtotal      Float
+  discount      Float    @default(0)
+  tax           Float    @default(0)
+  total         Float
+
+  status        String   @default("UNPAID")
+  dueDate       DateTime?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  customer Customer @relation(fields: [customerId], references: [id])
+  order    Order    @relation(fields: [orderId], references: [id])
+  payments Payment[]
+
+  @@index([customerId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model Payment {
+  id            Int      @id @default(autoincrement())
+  paymentNumber String   @unique
+
+  customerId Int
+  invoiceId  Int
+
+  amount        Float
+  paymentMethod String
+  reference     String?
+  notes         String?
+
+  paymentDate DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  customer Customer @relation(fields: [customerId], references: [id])
+  invoice  Invoice  @relation(fields: [invoiceId], references: [id])
+
+  @@index([customerId])
+  @@index([invoiceId])
+  @@index([paymentDate])
 }

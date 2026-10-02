@@ -7,19 +7,47 @@ import {
   updateCustomer,
   deleteCustomer,
 } from "../controllers/customer.controller.js";
-
+import { authorize } from "../middleware/role.middleware.js";
 import { authenticate } from "../middleware/auth.middleware.js";
 
 const router = Router();
 
-router.get("/", authenticate, getCustomers);
+router.get(
+  "/",
+  authenticate,
+  authorize("ADMIN", "MANAGER", "EMPLOYEE", "VIEWER"),
+  getCustomers
+);
 
-router.post("/", authenticate, createCustomer);
+router.post(
+  "/",
+  authenticate,
+  authorize("ADMIN", "MANAGER", "EMPLOYEE"),
+  createCustomer
+);
 
-router.get("/:id", authenticate, getCustomerById);
+router.get(
+  "/:id",
+  authenticate,
+  authorize("ADMIN", "MANAGER"),
+  getCustomerById
+);
 
-router.patch("/:id", authenticate, updateCustomer);
+router.patch(
+  "/:id",
+  authenticate,
+  authorize("ADMIN", "MANAGER", "EMPLOYEE"),
+  updateCustomer
+);
 
-router.delete("/:id", authenticate, deleteCustomer);
+router.delete(
+  "/:id",
+  authenticate,
+  authorize("ADMIN", "MANAGER"),
+  deleteCustomer
+);
+
+
+
 
 export default router;

@@ -8,10 +8,17 @@ import {
   getProducts,
   Product,
   updateProduct,
+  getCurrentUser
 } from "@/lib/api";
+import { useToast } from "@/components/ui/ToastProvider";
 
 export default function ProductsPage() {
+
+  const { showToast} = useToast()
+
+
   const [products, setProducts] = useState<Product[]>([]);
+  const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   const [search, setSearch] = useState("");
@@ -43,9 +50,35 @@ export default function ProductsPage() {
     }
   }
 
-  useEffect(() => {
-    loadProducts();
-  }, []);
+useEffect(() => {
+    async function loadData() {
+        try {
+            setLoading(true);
+
+            const [userResponse, productsResponse] =
+                await Promise.all([
+                    getCurrentUser(),
+                    getProducts(),
+                ]);
+
+            setUser(userResponse.data);
+            setProducts(productsResponse.data);
+        } catch (error) {
+            showToast({
+                title: "Error",
+                message:
+                    error instanceof Error
+                        ? error.message
+                        : "Failed to load products.",
+                type: "error",
+            });
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    loadData();
+}, []);
 
   function handleAdd() {
     setEditingProduct(null);
@@ -70,14 +103,7 @@ export default function ProductsPage() {
   }
 
   async function handleDelete(id: number) {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this product?"
-    );
-
-    if (!confirmed) {
-      return;
-    }
-
+  
     try {
       setError("");
 
@@ -250,6 +276,44 @@ function ProductTable({
   onEdit,
   onDelete,
 }: ProductTableProps) {
+
+  const { showToast } = useToast();
+
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+
+  useEffect(() => {
+    async function loadData() {
+        try {
+            setLoading(true);
+
+            const [userResponse, productsResponse] =
+                await Promise.all([
+                    getCurrentUser(),
+                    getProducts(),
+                ]);
+
+            setUser(userResponse.data);
+        } catch (error) {
+            showToast({
+                title: "Error",
+                message:
+                    error instanceof Error
+                        ? error.message
+                        : "Failed to load products.",
+                type: "error",
+            });
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    loadData();
+}, []);
+ 
+  
+
   if (products.length === 0) {
     return (
       <div className="rounded-2xl border border-slate-800 bg-slate-900 p-10 text-center">
@@ -359,11 +423,10 @@ function ProductTable({
                   <td className="px-6 py-4">
 
                     <p
-                      className={`text-sm font-medium ${
-                        lowStock
-                          ? "text-red-400"
-                          : "text-slate-300"
-                      }`}
+                      className={`text-sm font-medium ${lowStock
+                        ? "text-red-400"
+                        : "text-slate-300"
+                        }`}
                     >
                       {product.currentStock}{" "}
                       {product.unit}
@@ -389,9 +452,22 @@ function ProductTable({
 
                       <button
                         type="button"
-                        onClick={() =>
-                          onEdit(product)
-                        }
+                        onClick={() => {
+                          if (
+                            user?.role !== "ADMIN" &&
+                            user?.role !== "MANAGER"
+                          ) {
+                            showToast({
+                              title: "Permission Denied",
+                              message: "You do not have permission to edit products.",
+                              type: "error",
+                            });
+
+                            return;
+                          }
+
+                          onEdit(product);
+                        }}
                         className="rounded-lg border border-slate-700 px-3 py-1.5 text-xs font-medium text-slate-300 transition hover:bg-slate-800 hover:text-white"
                       >
                         Edit
@@ -399,9 +475,21 @@ function ProductTable({
 
                       <button
                         type="button"
-                        onClick={() =>
+                        onClick={() =>{
+                           if (
+                            user?.role !== "ADMIN" &&
+                            user?.role !== "MANAGER"
+                          ) {
+                            showToast({
+                              title: "Permission Denied",
+                              message: "You do not have permission to edit products.",
+                              type: "error",
+                            });
+
+                            return;
+                          }
                           onDelete(product.id)
-                        }
+                        }}
                         className="rounded-lg border border-red-900 px-3 py-1.5 text-xs font-medium text-red-400 transition hover:bg-red-950"
                       >
                         Delete
@@ -438,11 +526,10 @@ function StatusBadge({
 
   return (
     <span
-      className={`rounded-full px-3 py-1 text-xs font-medium ${
-        isActive
-          ? "bg-green-950 text-green-400"
-          : "bg-slate-800 text-slate-400"
-      }`}
+      className={`rounded-full px-3 py-1 text-xs font-medium ${isActive
+        ? "bg-green-950 text-green-400"
+        : "bg-slate-800 text-slate-400"
+        }`}
     >
       {status}
     </span>

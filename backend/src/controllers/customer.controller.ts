@@ -1,6 +1,5 @@
 import type { Request, Response } from "express";
 import { prisma } from "../lib/prisma.js";
-
 /* =====================================================
    GET ALL CUSTOMERS
 ===================================================== */
@@ -120,6 +119,7 @@ export async function getCustomerById(
   req: Request,
   res: Response
 ) {
+
   try {
     const id = Number(req.params.id);
 
@@ -135,6 +135,39 @@ export async function getCustomerById(
         where: {
           id,
         },
+        include: {
+          orders: {
+            orderBy: {
+              createdAt: "desc",
+            },
+            include: {
+              items: {
+                include: {
+                  product: true,
+                },
+              },
+            },
+          },
+
+          invoices: {
+            orderBy: {
+              createdAt: "desc",
+            },
+            include: {
+              payments: {
+                orderBy: {
+                  paymentDate: "desc",
+                },
+              },
+            },
+          },
+
+          payments: {
+            orderBy: {
+              paymentDate: "desc",
+            },
+          },
+        },
       });
 
     if (!customer) {
@@ -144,9 +177,83 @@ export async function getCustomerById(
       });
     }
 
+    /* =================================================
+       ORDER SUMMARY
+    ================================================= */
+
+    const totalOrders = customer.orders.length;
+
+    const totalOrderValue = customer.orders.reduce(
+      (sum, order) => sum + order.total,
+      0
+    );
+
+    const deliveredOrders = customer.orders.filter(
+      (order) => order.status === "DELIVERED"
+    ).length;
+
+    /* =================================================
+       INVOICE SUMMARY
+    ================================================= */
+
+    const totalInvoices = customer.invoices.length;
+
+    const totalInvoiced = customer.invoices.reduce(
+      (sum, invoice) => sum + invoice.total,
+      0
+    );
+
+    /* =================================================
+       PAYMENT SUMMARY
+    ================================================= */
+
+    const totalPaid = customer.payments.reduce(
+      (sum, payment) => sum + payment.amount,
+      0
+    );
+
+    /* =================================================
+       OUTSTANDING
+    ================================================= */
+
+    const outstandingBalance = Math.max(
+      totalInvoiced - totalPaid,
+      0
+    );
+
+    /* =================================================
+       AVAILABLE CREDIT
+    ================================================= */
+
+    const creditLimit = customer.creditLimit ?? 0;
+
+    const availableCredit = Math.max(
+      creditLimit - outstandingBalance,
+      0
+    );
+
+    /* =================================================
+       RESPONSE
+    ================================================= */
+
     return res.status(200).json({
       success: true,
-      data: customer,
+
+      data: {
+        ...customer,
+
+        summary: {
+          totalOrders,
+          deliveredOrders,
+          totalOrderValue,
+          totalInvoices,
+          totalInvoiced,
+          totalPaid,
+          outstandingBalance,
+          creditLimit,
+          availableCredit,
+        },
+      },
     });
   } catch (error) {
     console.error(
