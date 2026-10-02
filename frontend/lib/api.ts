@@ -342,7 +342,7 @@ export interface OrderItem {
     name: string;
     sku: string;
     unit: string;
-    currentStock: true;
+    currentStock: number;
   };
 }
 
