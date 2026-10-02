@@ -25,7 +25,7 @@ const PORT = Number(process.env.PORT) || 5000;
 app.use(helmet());
 app.use(
   cors({
-    origin: "https://opsflow-nine-alpha.vercel.app/",
+    origin: "https://opsflow-nine-alpha.vercel.app",
     credentials: true,
   })
 );
