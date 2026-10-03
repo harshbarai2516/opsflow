@@ -37,7 +37,7 @@ export async function registerUser(
       data: {
         email,
         password: hashedPassword,
-        role: "EMPLOYEE",
+        role: "ADMIN",
       },
       select: {
         id: true,
