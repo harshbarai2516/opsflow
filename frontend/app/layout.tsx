@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "OpsFlow",
-  description: "Business Operations Management Platform",
+  description: "Business Operations Management Software",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
